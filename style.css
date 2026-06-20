@@ -65,7 +65,7 @@ body {
 }
 
 .logo-fab { color: var(--amber); font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-.logo-quotes { color: var(--amber); font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.logo-quotes { color: var(--white); font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
 .logo-tag {
   color: rgba(255,255,255,0.5);
   font-size: 11px;
@@ -1399,3 +1399,4 @@ body {
 .login-box .logo-fab {
   color: var(--amber) !important;
 }
+
