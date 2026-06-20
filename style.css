@@ -900,3 +900,72 @@ body {
     margin-bottom: 6px;
   }
 }
+
+/* ======== LOGIN ======== */
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.login-box {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: var(--shadow-lg);
+}
+
+.login-logo {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.login-sub {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+
+.login-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 16px;
+}
+
+.login-error {
+  background: var(--danger-light);
+  border: 1px solid #f5b7b1;
+  color: var(--danger);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+/* ======== HEADER USER + LOGOUT ======== */
+.header-user {
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0 4px;
+}
+
+.btn-logout {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.btn-logout:hover { background: rgba(255,80,80,0.2); border-color: rgba(255,80,80,0.4); }
