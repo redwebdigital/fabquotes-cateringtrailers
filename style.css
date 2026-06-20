@@ -65,7 +65,7 @@ body {
 }
 
 .logo-fab { color: var(--amber); font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-.logo-quotes { color: var(--white); font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.logo-quotes { color: var(--amber); font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
 .logo-tag {
   color: rgba(255,255,255,0.5);
   font-size: 11px;
@@ -920,6 +920,7 @@ body {
   width: 100%;
   max-width: 360px;
   box-shadow: var(--shadow-lg);
+  color: var(--text-dark);
 }
 
 .login-logo {
@@ -927,6 +928,9 @@ body {
   font-size: 28px;
   font-weight: 800;
   margin-bottom: 4px;
+  display: flex;
+  justify-content: center;
+  gap: 2px;
 }
 
 .login-sub {
@@ -1376,4 +1380,22 @@ body {
 
 .job-card-body {
   border-top: 1px solid var(--border);
+}
+
+/* ======== LOGIN FORM FIX ======== */
+.login-box label {
+  color: var(--text-mid) !important;
+}
+
+.login-box input {
+  color: var(--text-dark) !important;
+  background: var(--white) !important;
+}
+
+.login-box .logo-quotes {
+  color: var(--navy) !important;
+}
+
+.login-box .logo-fab {
+  color: var(--amber) !important;
 }
