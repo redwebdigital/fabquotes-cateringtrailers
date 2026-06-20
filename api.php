@@ -168,21 +168,23 @@ try {
     }
     if ($action === 'addJobItem') {
         $id = genId();
-        $jobId   = $body['jobId']  ?? '';
-        $name    = trim($body['name']   ?? '');
-        $cost    = (float)($body['cost']   ?? 0);
-        $paidBy  = trim($body['paidBy']  ?? 'Phil123');
+        $jobId         = $body['jobId']        ?? '';
+        $name          = trim($body['name']         ?? '');
+        $cost          = (float)($body['cost']          ?? 0);
+        $paidBy        = trim($body['paidBy']        ?? 'Phil123');
+        $purchasePlace = trim($body['purchasePlace'] ?? '');
         if (!$jobId || !$name) respond(['error'=>'Invalid data'],400);
-        $db->prepare('INSERT INTO fq_job_items (id,job_id,name,cost,paid_by) VALUES (?,?,?,?,?)')->execute([$id,$jobId,$name,$cost,$paidBy]);
+        $db->prepare('INSERT INTO fq_job_items (id,job_id,name,cost,paid_by,purchase_place) VALUES (?,?,?,?,?,?)')->execute([$id,$jobId,$name,$cost,$paidBy,$purchasePlace]);
         respond(['success'=>true,'id'=>$id]);
     }
     if ($action === 'updateJobItem') {
-        $id = $body['id'] ?? '';
-        $name   = trim($body['name']  ?? '');
-        $cost   = (float)($body['cost']  ?? 0);
-        $paidBy = trim($body['paidBy'] ?? 'Phil123');
+        $id            = $body['id']            ?? '';
+        $name          = trim($body['name']          ?? '');
+        $cost          = (float)($body['cost']           ?? 0);
+        $paidBy        = trim($body['paidBy']        ?? 'Phil123');
+        $purchasePlace = trim($body['purchasePlace'] ?? '');
         if (!$id || !$name) respond(['error'=>'Invalid data'],400);
-        $db->prepare('UPDATE fq_job_items SET name=?,cost=?,paid_by=? WHERE id=?')->execute([$name,$cost,$paidBy,$id]);
+        $db->prepare('UPDATE fq_job_items SET name=?,cost=?,paid_by=?,purchase_place=? WHERE id=?')->execute([$name,$cost,$paidBy,$purchasePlace,$id]);
         respond(['success'=>true]);
     }
     if ($action === 'deleteJobItem') {

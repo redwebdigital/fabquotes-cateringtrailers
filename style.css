@@ -1269,3 +1269,74 @@ body {
   border-color: #1e8449;
   color: #1e8449;
 }
+
+/* ======== JOB ITEM META ======== */
+.job-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 3px;
+}
+
+.job-item-place {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+/* ======== JOB EDIT FORM ======== */
+.job-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0;
+}
+
+.job-edit-form input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--amber);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--amber-pale);
+}
+
+.job-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.job-edit-actions .btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+}
+
+/* ======== JOB PRINT BUTTON ======== */
+.job-print-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  font-size: 14px;
+}
+
+/* ======== PRINT JOB TOTALS ======== */
+.print-job-totals {
+  margin-top: 16px;
+  border-top: 2px solid #0d1b2a;
+  padding-top: 12px;
+}
+
+.print-job-total-row {
+  font-size: 15px;
+  padding: 4px 0;
+}
+
+.print-job-total-row.grand {
+  font-size: 18px;
+  color: #0d1b2a;
+  margin-top: 8px;
+  border-top: 1px solid #ddd;
+  padding-top: 8px;
+}

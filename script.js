@@ -607,6 +607,43 @@ function inlineEditSpec(itemEl, text, onSave) {
   itemEl.querySelector('.name-edit').focus();
 }
 
+/* ---- PRINT JOB SHEET ---- */
+function printJobSheet(job) {
+  const sortedItems = [...job.items].sort((a, b) => b.cost - a.cost);
+  const philTotal  = job.items.filter(i => i.paid_by === 'Phil123').reduce((s, i) => s + i.cost, 0);
+  const steTotal   = job.items.filter(i => i.paid_by === 'Ste123').reduce((s, i) => s + i.cost, 0);
+  const grandTotal = philTotal + steTotal;
+
+  const rows = sortedItems.map(i => `
+    <tr>
+      <td>${esc(i.name)}</td>
+      <td>${esc(i.purchase_place || '')}</td>
+      <td style="text-align:center;font-weight:700;color:${i.paid_by === 'Phil123' ? '#2471a3' : '#1e8449'}">${esc(i.paid_by)}</td>
+      <td style="text-align:right;font-weight:600">${fmtPrice(i.cost)}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('printArea').innerHTML = `
+    <div class="print-header">
+      <h1>FabQuotes – Job Cost Sheet</h1>
+      <p>${esc(job.name)} &nbsp;|&nbsp; ${new Date().toLocaleDateString('en-GB')}</p>
+    </div>
+    <div class="print-items">
+      <table>
+        <thead><tr><th>Item</th><th>Where Purchased</th><th style="text-align:center">Paid By</th><th style="text-align:right">Cost</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="print-job-totals">
+      <div class="print-job-total-row" style="color:#2471a3">Total Phil123: <strong>${fmtPrice(philTotal)}</strong></div>
+      <div class="print-job-total-row" style="color:#1e8449">Total Ste123: <strong>${fmtPrice(steTotal)}</strong></div>
+      <div class="print-job-total-row grand">Grand Total: <strong>${fmtPrice(grandTotal)}</strong></div>
+    </div>
+    <div class="print-footer">Printed from FabQuotes – fabquotes.com/cateringtrailers</div>
+  `;
+  window.print();
+}
+
 /* ---- ADD TRAILER ---- */
 document.getElementById('btnAddTrailer').addEventListener('click', async () => {
   const name  = document.getElementById('newTrailerName').value.trim();
@@ -718,7 +755,10 @@ function renderJobs() {
       <div class="job-item" data-id="${item.id}" data-job-id="${job.id}">
         <div class="job-item-info">
           <span class="job-item-name">${esc(item.name)}</span>
-          <span class="job-item-paid-by paid-by-${item.paid_by === 'Phil123' ? 'phil' : 'ste'}">${esc(item.paid_by)}</span>
+          <div class="job-item-meta">
+            <span class="job-item-paid-by paid-by-${item.paid_by === 'Phil123' ? 'phil' : 'ste'}">${esc(item.paid_by)}</span>
+            ${item.purchase_place ? `<span class="job-item-place">📍 ${esc(item.purchase_place)}</span>` : ''}
+          </div>
         </div>
         <div class="job-item-right">
           <span class="job-item-cost">${fmtPrice(item.cost)}</span>
@@ -750,6 +790,9 @@ function renderJobs() {
             <input type="text" class="job-item-name-input" placeholder="Item name" data-job-id="${job.id}" />
             <input type="number" class="job-item-cost-input" placeholder="£ Cost" min="0" step="0.01" data-job-id="${job.id}" />
           </div>
+          <div class="job-add-row">
+            <input type="text" class="job-item-place-input" placeholder="Place of purchase (optional)" data-job-id="${job.id}" />
+          </div>
           <div class="job-paidby-row">
             <span class="paidby-label">Paid by:</span>
             <button class="paidby-btn paidby-phil active-paidby" data-job-id="${job.id}" data-who="Phil123">Phil123</button>
@@ -775,6 +818,7 @@ function renderJobs() {
             <span>Grand Total</span>
             <span>${fmtPrice(grandTotal)}</span>
           </div>
+          <button class="btn btn-print job-print-btn" data-action="print-job" data-id="${job.id}">🖨️ Print Job Cost Sheet</button>
         </div>
       </div>
     `;
@@ -803,13 +847,16 @@ function renderJobs() {
       const nameInput  = container.querySelector(`.job-item-name-input[data-job-id="${jobId}"]`);
       const costInput  = container.querySelector(`.job-item-cost-input[data-job-id="${jobId}"]`);
       const paidInput  = container.querySelector(`.job-item-paidby-input[data-job-id="${jobId}"]`);
+      const placeInput = container.querySelector(`.job-item-place-input[data-job-id="${jobId}"]`);
       const name  = nameInput.value.trim();
       const cost  = parseFloat(costInput.value) || 0;
       const paidBy = paidInput.value;
+      const purchasePlace = placeInput ? placeInput.value.trim() : '';
       if (!name) { showToast('Enter an item name.', 'error'); return; }
-      await api('addJobItem', { jobId, name, cost, paidBy });
+      await api('addJobItem', { jobId, name, cost, paidBy, purchasePlace });
       nameInput.value = '';
       costInput.value = '';
+      if (placeInput) placeInput.value = '';
       await loadJobs();
       showToast('Item added ✓', 'success');
     });
@@ -852,15 +899,51 @@ async function handleJobAction(e) {
     const item = job.items.find(i => i.id === id);
     if (!item) return;
 
-    const newName  = prompt('Item name:', item.name);
-    if (!newName) return;
-    const newCost  = parseFloat(prompt('Cost £:', item.cost) || item.cost);
-    const newPaidBy = prompt('Paid by (Phil123 or Ste123):', item.paid_by);
-    if (!newPaidBy) return;
+    const itemEl = e.target.closest('.job-item');
+    itemEl.innerHTML = `
+      <div class="job-edit-form">
+        <input class="job-edit-name" type="text" value="${esc(item.name)}" placeholder="Item name" />
+        <input class="job-edit-cost" type="number" value="${item.cost}" placeholder="Cost £" min="0" step="0.01" />
+        <input class="job-edit-place" type="text" value="${esc(item.purchase_place || '')}" placeholder="Place of purchase" />
+        <div class="job-paidby-row">
+          <span class="paidby-label">Paid by:</span>
+          <button class="paidby-btn paidby-phil${item.paid_by === 'Phil123' ? ' active-paidby' : ''}" data-who="Phil123">Phil123</button>
+          <button class="paidby-btn paidby-ste${item.paid_by === 'Ste123' ? ' active-paidby' : ''}\" data-who="Ste123">Ste123</button>
+          <input type="hidden" class="job-edit-paidby" value="${esc(item.paid_by)}" />
+        </div>
+        <div class="job-edit-actions">
+          <button class="btn btn-primary btn-sm job-edit-save">Save</button>
+          <button class="btn btn-ghost btn-sm job-edit-cancel">Cancel</button>
+        </div>
+      </div>
+    `;
 
-    await api('updateJobItem', { id, name: newName.trim(), cost: newCost, paidBy: newPaidBy.trim() });
-    await loadJobs();
-    showToast('Item updated ✓', 'success');
+    itemEl.querySelectorAll('.paidby-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        itemEl.querySelectorAll('.paidby-btn').forEach(b => b.classList.remove('active-paidby'));
+        btn.classList.add('active-paidby');
+        itemEl.querySelector('.job-edit-paidby').value = btn.dataset.who;
+      });
+    });
+
+    itemEl.querySelector('.job-edit-save').addEventListener('click', async () => {
+      const name  = itemEl.querySelector('.job-edit-name').value.trim();
+      const cost  = parseFloat(itemEl.querySelector('.job-edit-cost').value) || 0;
+      const paidBy = itemEl.querySelector('.job-edit-paidby').value;
+      const purchasePlace = itemEl.querySelector('.job-edit-place').value.trim();
+      if (!name) { showToast('Enter item name.', 'error'); return; }
+      await api('updateJobItem', { id, name, cost, paidBy, purchasePlace });
+      await loadJobs();
+      showToast('Updated ✓', 'success');
+    });
+
+    itemEl.querySelector('.job-edit-cancel').addEventListener('click', () => loadJobs());
+  }
+
+  if (action === 'print-job') {
+    const job = jobs.find(j => j.id === id);
+    if (!job) return;
+    printJobSheet(job);
   }
 }
 
