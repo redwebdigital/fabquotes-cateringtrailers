@@ -709,11 +709,12 @@ function renderJobs() {
   }
 
   container.innerHTML = jobs.map(job => {
+    const sortedItems = [...job.items].sort((a, b) => b.cost - a.cost);
     const philTotal = job.items.filter(i => i.paid_by === 'Phil123').reduce((s, i) => s + i.cost, 0);
     const steTotal  = job.items.filter(i => i.paid_by === 'Ste123').reduce((s, i) => s + i.cost, 0);
     const grandTotal = philTotal + steTotal;
 
-    const itemRows = job.items.map(item => `
+    const itemRows = sortedItems.map(item => `
       <div class="job-item" data-id="${item.id}" data-job-id="${job.id}">
         <div class="job-item-info">
           <span class="job-item-name">${esc(item.name)}</span>
@@ -749,11 +750,13 @@ function renderJobs() {
             <input type="text" class="job-item-name-input" placeholder="Item name" data-job-id="${job.id}" />
             <input type="number" class="job-item-cost-input" placeholder="£ Cost" min="0" step="0.01" data-job-id="${job.id}" />
           </div>
+          <div class="job-paidby-row">
+            <span class="paidby-label">Paid by:</span>
+            <button class="paidby-btn paidby-phil active-paidby" data-job-id="${job.id}" data-who="Phil123">Phil123</button>
+            <button class="paidby-btn paidby-ste" data-job-id="${job.id}" data-who="Ste123">Ste123</button>
+            <input type="hidden" class="job-item-paidby-input" data-job-id="${job.id}" value="Phil123" />
+          </div>
           <div class="job-add-row">
-            <select class="job-item-paidby-input" data-job-id="${job.id}">
-              <option value="Phil123">Phil123</option>
-              <option value="Ste123">Ste123</option>
-            </select>
             <button class="btn btn-primary btn-sm job-btn-add-item" data-job-id="${job.id}">Add Item</button>
           </div>
         </div>
@@ -780,6 +783,18 @@ function renderJobs() {
   // Bind events
   container.querySelectorAll('[data-action]').forEach(btn => {
     btn.addEventListener('click', handleJobAction);
+  });
+
+  // Paid by buttons
+  container.querySelectorAll('.paidby-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const jobId = btn.dataset.jobId;
+      const who = btn.dataset.who;
+      container.querySelectorAll(`.paidby-btn[data-job-id="${jobId}"]`).forEach(b => b.classList.remove('active-paidby'));
+      btn.classList.add('active-paidby');
+      const hidden = container.querySelector(`.job-item-paidby-input[data-job-id="${jobId}"]`);
+      if (hidden) hidden.value = who;
+    });
   });
 
   container.querySelectorAll('.job-btn-add-item').forEach(btn => {
