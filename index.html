@@ -42,6 +42,7 @@
     <section class="card" id="sectionAddons">
       <div class="card-label">Step 2</div>
       <h2 class="card-title">Select Add-Ons</h2>
+      <p class="card-hint">Tap an add-on to select it, then enter supplier details below it.</p>
       <div class="addon-list" id="addonList"></div>
     </section>
 
@@ -104,6 +105,7 @@
       <button class="btn-close" id="btnCloseManage">✕</button>
     </div>
 
+    <!-- TRAILER SIZES -->
     <div class="manage-section">
       <h3 class="manage-heading">Trailer Sizes</h3>
       <div id="manageTrailerList"></div>
@@ -114,8 +116,9 @@
       </div>
     </div>
 
+    <!-- ADD-ONS -->
     <div class="manage-section">
-      <h3 class="manage-heading">Add-Ons</h3>
+      <h3 class="manage-heading">Add-Ons &amp; Supplier Info</h3>
       <div id="manageAddonList"></div>
       <div class="manage-add-row">
         <input type="text" id="newAddonName" placeholder="Add-on name" />
@@ -123,6 +126,17 @@
         <button class="btn btn-primary btn-sm" id="btnAddAddon">Add</button>
       </div>
     </div>
+
+    <!-- STANDARD SPECS -->
+    <div class="manage-section">
+      <h3 class="manage-heading">Standard Specifications (Included)</h3>
+      <div id="manageSpecsList"></div>
+      <div class="manage-add-row">
+        <input type="text" id="newSpecText" placeholder="Spec item text" style="flex:2" />
+        <button class="btn btn-primary btn-sm" id="btnAddSpec">Add</button>
+      </div>
+    </div>
+
   </div>
 
   <!-- QUOTE DETAIL MODAL -->
@@ -131,10 +145,11 @@
       <h2>Quote Detail</h2>
       <button class="btn-close" id="btnCloseDetail">✕</button>
     </div>
-    <div id="quoteDetailContent"></div>
+    <div id="quoteDetailContent" style="padding:16px"></div>
     <div class="detail-actions">
       <button class="btn btn-primary" id="btnEditQuote">Edit Quote</button>
-      <button class="btn btn-print" id="btnPrintQuote">Print</button>
+      <button class="btn btn-print" id="btnPrintQuote">Print Customer Quote</button>
+      <button class="btn btn-print-admin" id="btnPrintAdmin">Print Admin Copy</button>
       <button class="btn btn-danger" id="btnDeleteQuote">Delete</button>
     </div>
   </div>

@@ -705,3 +705,129 @@ body {
   .trailer-grid { grid-template-columns: repeat(2, 1fr); }
   .total-amount { font-size: 28px; }
 }
+
+/* ======== SUPPLIER FIELDS ON ADD-ON ======== */
+.addon-supplier-fields {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.addon-supplier-fields input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1.5px solid var(--amber);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--amber-pale);
+}
+
+.addon-supplier-fields input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(245,166,35,0.15);
+}
+
+/* ======== MANAGE SUPPLIER ROW ======== */
+.manage-item-addon { flex-direction: column; align-items: stretch; gap: 8px; }
+.manage-item-top { display: flex; align-items: center; gap: 10px; }
+.manage-item-top .manage-item-name { flex: 1; }
+.manage-item-top .manage-item-price { min-width: 60px; text-align: right; }
+
+.manage-supplier-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 0 4px;
+  border-top: 1px dashed var(--border);
+}
+
+.manage-supplier-row input {
+  flex: 1;
+  min-width: 100px;
+  padding: 7px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--offwhite);
+}
+
+.manage-supplier-row input:focus {
+  outline: none;
+  border-color: var(--amber);
+}
+
+.manage-btn-supplier-save {
+  white-space: nowrap;
+}
+
+/* ======== SUMMARY SPECS ======== */
+.summary-specs-heading {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-light);
+  margin: 14px 0 8px;
+}
+
+.summary-specs-list {
+  margin: 0 0 6px 18px;
+  padding: 0;
+}
+
+.summary-specs-list li {
+  font-size: 13px;
+  color: var(--text-mid);
+  padding: 3px 0;
+  line-height: 1.4;
+}
+
+/* ======== SUPPLIER INFO IN SUMMARY ======== */
+.summary-supplier-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 4px 0 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.supplier-link {
+  font-size: 12px;
+  color: var(--amber-dark);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.supplier-link:hover { text-decoration: underline; }
+
+.supplier-cost {
+  font-size: 12px;
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* ======== CARD HINT ======== */
+.card-hint {
+  font-size: 13px;
+  color: var(--text-light);
+  margin: -8px 0 12px;
+}
+
+/* ======== ADMIN PRINT BUTTON ======== */
+.btn-print-admin {
+  background: #6c3483;
+  color: var(--white);
+}
+
+.btn-print-admin:hover { background: #5b2c6f; }
+
+/* ======== PRINT SPECS ======== */
+.print-specs { margin-top: 16px; }
+.print-specs h3 { font-size: 14px; font-weight: 700; color: #0d1b2a; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+.print-specs ul { margin: 0 0 0 18px; padding: 0; }
+.print-specs li { font-size: 13px; color: #444; padding: 2px 0; }
+.print-supplier-row td { background: #f9f9f9; }
+.print-supplier-row a { color: #d4891a; font-size: 12px; }
