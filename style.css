@@ -831,3 +831,72 @@ body {
 .print-specs li { font-size: 13px; color: #444; padding: 2px 0; }
 .print-supplier-row td { background: #f9f9f9; }
 .print-supplier-row a { color: #d4891a; font-size: 12px; }
+
+/* ======== MOBILE MANAGE FIXES ======== */
+@media (max-width: 600px) {
+  .manage-item {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .manage-item-name {
+    flex: 1 1 100%;
+    font-size: 14px;
+  }
+
+  .manage-item-price {
+    font-size: 14px;
+  }
+
+  .manage-item-actions {
+    flex: 1 1 100%;
+    display: flex;
+    gap: 8px;
+  }
+
+  .manage-btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px 10px;
+  }
+
+  .manage-item-top {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .manage-item-top .manage-item-name {
+    flex: 1 1 100%;
+  }
+
+  .manage-item-top .manage-item-actions {
+    flex: 1 1 100%;
+  }
+
+  .manage-supplier-row {
+    flex-direction: column;
+  }
+
+  .manage-supplier-row input {
+    width: 100%;
+  }
+
+  .manage-add-row {
+    flex-direction: column;
+  }
+
+  .manage-add-row input {
+    width: 100%;
+  }
+
+  .manage-add-row .btn {
+    width: 100%;
+  }
+
+  .manage-item input.name-edit,
+  .manage-item input.price-edit {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 6px;
+  }
+}
