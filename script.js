@@ -64,7 +64,7 @@ async function doLogin() {
   const res = await api('login', { username });
   if (res.error) { errEl.textContent = 'Username not recognised. Try Phil123 or Ste123.'; errEl.style.display = 'block'; return; }
   state.user = res.user;
-  sessionStorage.setItem('fq_user', JSON.stringify(res.user));
+  localStorage.setItem('fq_user', JSON.stringify({ user: res.user, expiry: Date.now() + 86400000 }));
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
   document.getElementById('headerUser').textContent = res.user.username;
@@ -73,7 +73,7 @@ async function doLogin() {
 
 document.getElementById('btnLogout').addEventListener('click', () => {
   state.user = null;
-  sessionStorage.removeItem('fq_user');
+  localStorage.removeItem('fq_user');
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginUsername').value = '';
@@ -655,12 +655,21 @@ document.getElementById('btnDeleteQuote').addEventListener('click', deleteQuote)
 document.getElementById('btnPrintQuote').addEventListener('click', () => printQuote(false));
 document.getElementById('btnPrintAdmin').addEventListener('click', () => printQuote(true));
 
-/* ---- AUTO LOGIN FROM SESSION ---- */
-const savedUser = sessionStorage.getItem('fq_user');
-if (savedUser) {
-  state.user = JSON.parse(savedUser);
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('mainApp').style.display = 'block';
-  document.getElementById('headerUser').textContent = state.user.username;
-  loadData();
+/* ---- AUTO LOGIN FROM LOCALSTORAGE (24hr) ---- */
+const savedSession = localStorage.getItem('fq_user');
+if (savedSession) {
+  try {
+    const parsed = JSON.parse(savedSession);
+    if (parsed.expiry && Date.now() < parsed.expiry) {
+      state.user = parsed.user;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
+      document.getElementById('headerUser').textContent = state.user.username;
+      loadData();
+    } else {
+      localStorage.removeItem('fq_user');
+    }
+  } catch(e) {
+    localStorage.removeItem('fq_user');
+  }
 }
