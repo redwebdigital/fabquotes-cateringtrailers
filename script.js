@@ -526,8 +526,8 @@ function inlineEdit(itemEl, obj, onSave) {
     <input class="name-edit" type="text" value="${esc(obj.name)}" placeholder="Name" style="flex:1" />
     <input class="price-edit" type="number" value="${obj.price}" placeholder="Price" min="0" style="max-width:100px" />
     <div class="manage-item-actions">
-      <button class="manage-btn manage-btn-edit" data-action="save">Save</button>
-      <button class="manage-btn manage-btn-delete" data-action="cancel">Cancel</button>
+      <button class="manage-btn manage-btn-edit" id="inlineSaveBtn">Save</button>
+      <button class="manage-btn manage-btn-delete" id="inlineCancelBtn">Cancel</button>
     </div>
   `;
 
