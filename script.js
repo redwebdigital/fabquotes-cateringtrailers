@@ -110,7 +110,7 @@ function renderTrailers() {
   if (!grid) return;
   grid.innerHTML = state.trailers.map(t => `
     <button class="trailer-btn${state.selectedTrailerId === t.id ? ' selected' : ''}" data-id="${t.id}">
-      <div class="trailer-btn-icon">🚐</div>
+      <div class="trailer-btn-icon">🏕️</div>
       <div class="trailer-btn-name">${esc(t.name)}</div>
       <div class="trailer-btn-price">${fmtPrice(t.price)}</div>
     </button>
@@ -747,8 +747,8 @@ function renderJobs() {
 
   container.innerHTML = jobs.map(job => {
     const sortedItems = [...job.items].sort((a, b) => b.cost - a.cost);
-    const philTotal = job.items.filter(i => i.paid_by === 'Phil123').reduce((s, i) => s + i.cost, 0);
-    const steTotal  = job.items.filter(i => i.paid_by === 'Ste123').reduce((s, i) => s + i.cost, 0);
+    const philTotal  = job.items.filter(i => i.paid_by === 'Phil123').reduce((s, i) => s + i.cost, 0);
+    const steTotal   = job.items.filter(i => i.paid_by === 'Ste123').reduce((s, i) => s + i.cost, 0);
     const grandTotal = philTotal + steTotal;
 
     const itemRows = sortedItems.map(item => `
@@ -770,59 +770,84 @@ function renderJobs() {
 
     return `
       <div class="job-card" data-id="${job.id}">
-        <div class="job-card-header">
+
+        <!-- COLLAPSED HEADER - always visible -->
+        <div class="job-card-header job-card-toggle" data-job-id="${job.id}">
           <div class="job-card-title-row">
-            <h3 class="job-card-name">${esc(job.name)}</h3>
-            <div class="job-card-actions">
-              <button class="manage-btn manage-btn-edit" data-action="edit-job" data-id="${job.id}">Edit</button>
-              <button class="manage-btn manage-btn-delete" data-action="del-job" data-id="${job.id}">Delete</button>
+            <div class="job-card-title-left">
+              <h3 class="job-card-name">${esc(job.name)}</h3>
+              <span class="job-card-summary">${job.items.length} items &nbsp;|&nbsp; Total: ${fmtPrice(grandTotal)}</span>
+            </div>
+            <div class="job-card-header-right">
+              <span class="job-card-chevron">▼</span>
+              <div class="job-card-actions" onclick="event.stopPropagation()">
+                <button class="manage-btn manage-btn-edit" data-action="edit-job" data-id="${job.id}">Edit</button>
+                <button class="manage-btn manage-btn-delete" data-action="del-job" data-id="${job.id}">Delete</button>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="job-items-list">
-          ${itemRows || '<div class="job-no-items">No items yet.</div>'}
-        </div>
+        <!-- EXPANDABLE BODY -->
+        <div class="job-card-body" id="jobBody-${job.id}" style="display:none">
 
-        <!-- ADD ITEM FORM -->
-        <div class="job-add-item-form">
-          <div class="job-add-row">
-            <input type="text" class="job-item-name-input" placeholder="Item name" data-job-id="${job.id}" />
-            <input type="number" class="job-item-cost-input" placeholder="£ Cost" min="0" step="0.01" data-job-id="${job.id}" />
+          <div class="job-items-list">
+            ${itemRows || '<div class="job-no-items">No items yet.</div>'}
           </div>
-          <div class="job-add-row">
-            <input type="text" class="job-item-place-input" placeholder="Place of purchase (optional)" data-job-id="${job.id}" />
-          </div>
-          <div class="job-paidby-row">
-            <span class="paidby-label">Paid by:</span>
-            <button class="paidby-btn paidby-phil active-paidby" data-job-id="${job.id}" data-who="Phil123">Phil123</button>
-            <button class="paidby-btn paidby-ste" data-job-id="${job.id}" data-who="Ste123">Ste123</button>
-            <input type="hidden" class="job-item-paidby-input" data-job-id="${job.id}" value="Phil123" />
-          </div>
-          <div class="job-add-row">
-            <button class="btn btn-primary btn-sm job-btn-add-item" data-job-id="${job.id}">Add Item</button>
-          </div>
-        </div>
 
-        <!-- TOTALS -->
-        <div class="job-totals">
-          <div class="job-total-row phil">
-            <span>Total Phil123</span>
-            <span>${fmtPrice(philTotal)}</span>
+          <!-- ADD ITEM FORM -->
+          <div class="job-add-item-form">
+            <div class="job-add-row">
+              <input type="text" class="job-item-name-input" placeholder="Item name" data-job-id="${job.id}" />
+              <input type="number" class="job-item-cost-input" placeholder="£ Cost" min="0" step="0.01" data-job-id="${job.id}" />
+            </div>
+            <div class="job-add-row">
+              <input type="text" class="job-item-place-input" placeholder="Place of purchase (optional)" data-job-id="${job.id}" />
+            </div>
+            <div class="job-paidby-row">
+              <span class="paidby-label">Paid by:</span>
+              <button class="paidby-btn paidby-phil active-paidby" data-job-id="${job.id}" data-who="Phil123">Phil123</button>
+              <button class="paidby-btn paidby-ste" data-job-id="${job.id}" data-who="Ste123">Ste123</button>
+              <input type="hidden" class="job-item-paidby-input" data-job-id="${job.id}" value="Phil123" />
+            </div>
+            <div class="job-add-row">
+              <button class="btn btn-primary btn-sm job-btn-add-item" data-job-id="${job.id}">Add Item</button>
+            </div>
           </div>
-          <div class="job-total-row ste">
-            <span>Total Ste123</span>
-            <span>${fmtPrice(steTotal)}</span>
+
+          <!-- TOTALS -->
+          <div class="job-totals">
+            <div class="job-total-row phil">
+              <span>Total Phil123</span>
+              <span>${fmtPrice(philTotal)}</span>
+            </div>
+            <div class="job-total-row ste">
+              <span>Total Ste123</span>
+              <span>${fmtPrice(steTotal)}</span>
+            </div>
+            <div class="job-total-row grand">
+              <span>Grand Total</span>
+              <span>${fmtPrice(grandTotal)}</span>
+            </div>
+            <button class="btn btn-print job-print-btn" data-action="print-job" data-id="${job.id}">🖨️ Print Job Cost Sheet</button>
           </div>
-          <div class="job-total-row grand">
-            <span>Grand Total</span>
-            <span>${fmtPrice(grandTotal)}</span>
-          </div>
-          <button class="btn btn-print job-print-btn" data-action="print-job" data-id="${job.id}">🖨️ Print Job Cost Sheet</button>
-        </div>
+
+        </div><!-- end job-card-body -->
       </div>
     `;
   }).join('');
+
+  // Toggle expand/collapse
+  container.querySelectorAll('.job-card-toggle').forEach(header => {
+    header.addEventListener('click', () => {
+      const jobId = header.dataset.jobId;
+      const body = document.getElementById(`jobBody-${jobId}`);
+      const chevron = header.querySelector('.job-card-chevron');
+      const isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      chevron.textContent = isOpen ? '▼' : '▲';
+    });
+  });
 
   // Bind events
   container.querySelectorAll('[data-action]').forEach(btn => {
@@ -858,6 +883,10 @@ function renderJobs() {
       costInput.value = '';
       if (placeInput) placeInput.value = '';
       await loadJobs();
+      // Re-open the job that was being edited
+      const body = document.getElementById(`jobBody-${jobId}`);
+      const chevron = document.querySelector(`.job-card-toggle[data-job-id="${jobId}"] .job-card-chevron`);
+      if (body) { body.style.display = 'block'; if (chevron) chevron.textContent = '▲'; }
       showToast('Item added ✓', 'success');
     });
   });
