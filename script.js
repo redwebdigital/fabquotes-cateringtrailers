@@ -673,3 +673,188 @@ if (savedSession) {
     localStorage.removeItem('fq_user');
   }
 }
+
+/* =========================================
+   JOB COSTING
+   ========================================= */
+
+let jobs = [];
+
+/* ---- TABS ---- */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    if (tab === 'quotes') document.getElementById('tabQuotes').style.display = '';
+    if (tab === 'jobs')   { document.getElementById('tabJobs').style.display = ''; loadJobs(); }
+  });
+});
+
+/* ---- LOAD JOBS ---- */
+async function loadJobs() {
+  const res = await api('getJobs');
+  if (res.error) { showToast('Error loading jobs', 'error'); return; }
+  jobs = res.jobs || [];
+  renderJobs();
+}
+
+/* ---- RENDER JOBS ---- */
+function renderJobs() {
+  const container = document.getElementById('jobsList');
+  if (!jobs.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🔧</div><div class="empty-text">No jobs yet. Create one above.</div></div>`;
+    return;
+  }
+
+  container.innerHTML = jobs.map(job => {
+    const philTotal = job.items.filter(i => i.paid_by === 'Phil123').reduce((s, i) => s + i.cost, 0);
+    const steTotal  = job.items.filter(i => i.paid_by === 'Ste123').reduce((s, i) => s + i.cost, 0);
+    const grandTotal = philTotal + steTotal;
+
+    const itemRows = job.items.map(item => `
+      <div class="job-item" data-id="${item.id}" data-job-id="${job.id}">
+        <div class="job-item-info">
+          <span class="job-item-name">${esc(item.name)}</span>
+          <span class="job-item-paid-by paid-by-${item.paid_by === 'Phil123' ? 'phil' : 'ste'}">${esc(item.paid_by)}</span>
+        </div>
+        <div class="job-item-right">
+          <span class="job-item-cost">${fmtPrice(item.cost)}</span>
+          <button class="job-item-edit" data-action="edit-item" data-id="${item.id}" data-job-id="${job.id}">Edit</button>
+          <button class="job-item-delete" data-action="del-item" data-id="${item.id}" data-job-id="${job.id}">✕</button>
+        </div>
+      </div>
+    `).join('');
+
+    return `
+      <div class="job-card" data-id="${job.id}">
+        <div class="job-card-header">
+          <div class="job-card-title-row">
+            <h3 class="job-card-name">${esc(job.name)}</h3>
+            <div class="job-card-actions">
+              <button class="manage-btn manage-btn-edit" data-action="edit-job" data-id="${job.id}">Edit</button>
+              <button class="manage-btn manage-btn-delete" data-action="del-job" data-id="${job.id}">Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="job-items-list">
+          ${itemRows || '<div class="job-no-items">No items yet.</div>'}
+        </div>
+
+        <!-- ADD ITEM FORM -->
+        <div class="job-add-item-form">
+          <div class="job-add-row">
+            <input type="text" class="job-item-name-input" placeholder="Item name" data-job-id="${job.id}" />
+            <input type="number" class="job-item-cost-input" placeholder="£ Cost" min="0" step="0.01" data-job-id="${job.id}" />
+          </div>
+          <div class="job-add-row">
+            <select class="job-item-paidby-input" data-job-id="${job.id}">
+              <option value="Phil123">Phil123</option>
+              <option value="Ste123">Ste123</option>
+            </select>
+            <button class="btn btn-primary btn-sm job-btn-add-item" data-job-id="${job.id}">Add Item</button>
+          </div>
+        </div>
+
+        <!-- TOTALS -->
+        <div class="job-totals">
+          <div class="job-total-row phil">
+            <span>Total Phil123</span>
+            <span>${fmtPrice(philTotal)}</span>
+          </div>
+          <div class="job-total-row ste">
+            <span>Total Ste123</span>
+            <span>${fmtPrice(steTotal)}</span>
+          </div>
+          <div class="job-total-row grand">
+            <span>Grand Total</span>
+            <span>${fmtPrice(grandTotal)}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Bind events
+  container.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', handleJobAction);
+  });
+
+  container.querySelectorAll('.job-btn-add-item').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const jobId = btn.dataset.jobId;
+      const nameInput  = container.querySelector(`.job-item-name-input[data-job-id="${jobId}"]`);
+      const costInput  = container.querySelector(`.job-item-cost-input[data-job-id="${jobId}"]`);
+      const paidInput  = container.querySelector(`.job-item-paidby-input[data-job-id="${jobId}"]`);
+      const name  = nameInput.value.trim();
+      const cost  = parseFloat(costInput.value) || 0;
+      const paidBy = paidInput.value;
+      if (!name) { showToast('Enter an item name.', 'error'); return; }
+      await api('addJobItem', { jobId, name, cost, paidBy });
+      nameInput.value = '';
+      costInput.value = '';
+      await loadJobs();
+      showToast('Item added ✓', 'success');
+    });
+  });
+}
+
+/* ---- JOB ACTIONS ---- */
+async function handleJobAction(e) {
+  const action = e.target.dataset.action;
+  const id     = e.target.dataset.id;
+  const jobId  = e.target.dataset.jobId;
+
+  if (action === 'del-job') {
+    if (!confirm('Delete this entire job and all its items?')) return;
+    await api('deleteJob', { id });
+    await loadJobs();
+    showToast('Job deleted.');
+  }
+
+  if (action === 'edit-job') {
+    const job = jobs.find(j => j.id === id);
+    if (!job) return;
+    const newName = prompt('Edit job name:', job.name);
+    if (!newName || !newName.trim()) return;
+    await api('updateJob', { id, name: newName.trim() });
+    await loadJobs();
+    showToast('Job updated ✓', 'success');
+  }
+
+  if (action === 'del-item') {
+    if (!confirm('Delete this item?')) return;
+    await api('deleteJobItem', { id });
+    await loadJobs();
+    showToast('Item deleted.');
+  }
+
+  if (action === 'edit-item') {
+    const job  = jobs.find(j => j.id === jobId);
+    if (!job) return;
+    const item = job.items.find(i => i.id === id);
+    if (!item) return;
+
+    const newName  = prompt('Item name:', item.name);
+    if (!newName) return;
+    const newCost  = parseFloat(prompt('Cost £:', item.cost) || item.cost);
+    const newPaidBy = prompt('Paid by (Phil123 or Ste123):', item.paid_by);
+    if (!newPaidBy) return;
+
+    await api('updateJobItem', { id, name: newName.trim(), cost: newCost, paidBy: newPaidBy.trim() });
+    await loadJobs();
+    showToast('Item updated ✓', 'success');
+  }
+}
+
+/* ---- ADD JOB ---- */
+document.getElementById('btnAddJob').addEventListener('click', async () => {
+  const name = document.getElementById('newJobName').value.trim();
+  if (!name) { showToast('Enter a job name.', 'error'); return; }
+  await api('addJob', { name, userId: state.user?.id });
+  document.getElementById('newJobName').value = '';
+  await loadJobs();
+  showToast('Job created ✓', 'success');
+});

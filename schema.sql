@@ -89,3 +89,21 @@ INSERT IGNORE INTO fq_specs (id, text, sort_order) VALUES
 ('s16', 'Gas safe certificate', 16),
 ('s17', 'NICEIC electrical certificate', 17),
 ('s18', 'VOSA approved certificate', 18);
+
+-- Job Costing Tables (add these if not already present)
+CREATE TABLE IF NOT EXISTS fq_jobs (
+    id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS fq_job_items (
+    id VARCHAR(36) PRIMARY KEY,
+    job_id VARCHAR(36) NOT NULL,
+    name VARCHAR(200) NOT NULL,
+    cost DECIMAL(10,2) NOT NULL DEFAULT 0,
+    paid_by VARCHAR(50) NOT NULL DEFAULT 'Phil123',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (job_id) REFERENCES fq_jobs(id) ON DELETE CASCADE
+);
