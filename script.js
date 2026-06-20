@@ -110,7 +110,7 @@ function renderTrailers() {
   if (!grid) return;
   grid.innerHTML = state.trailers.map(t => `
     <button class="trailer-btn${state.selectedTrailerId === t.id ? ' selected' : ''}" data-id="${t.id}">
-      <div class="trailer-btn-icon"><img src="trailer-icon.png" style="width:60px;height:auto;margin-bottom:6px" /><img src="trailer-icon.png" style="width:60px;height:auto;margin-bottom:6px" /></div>
+      <div class="trailer-btn-icon"><img src="trailer-icon.png" style="width:60px;height:auto;margin-bottom:6px" /></div>
       <div class="trailer-btn-name">${esc(t.name)}</div>
       <div class="trailer-btn-price">${fmtPrice(t.price)}</div>
     </button>
@@ -985,4 +985,5 @@ document.getElementById('btnAddJob').addEventListener('click', async () => {
   await loadJobs();
   showToast('Job created ✓', 'success');
 });
+
 
