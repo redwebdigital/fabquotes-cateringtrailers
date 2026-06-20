@@ -626,7 +626,7 @@ function printJobSheet(job) {
   document.getElementById('printArea').innerHTML = `
     <div class="print-header">
       <h1>FabQuotes – Job Cost Sheet</h1>
-      <p>${esc(job.name)} &nbsp;|&nbsp; ${new Date().toLocaleDateString('en-GB')}</p>
+      <p>${esc(job.name)}${job.job_number ? ` &nbsp;|&nbsp; Job #${esc(job.job_number)}` : ''} &nbsp;|&nbsp; ${new Date().toLocaleDateString('en-GB')}</p>
     </div>
     <div class="print-items">
       <table>
@@ -776,6 +776,7 @@ function renderJobs() {
           <div class="job-card-title-row">
             <div class="job-card-title-left">
               <h3 class="job-card-name">${esc(job.name)}</h3>
+              ${job.job_number ? `<span class="job-card-number">Job #${esc(job.job_number)}</span>` : ''}
               <span class="job-card-summary">${job.items.length} items &nbsp;|&nbsp; Total: ${fmtPrice(grandTotal)}</span>
             </div>
             <div class="job-card-header-right">
@@ -910,7 +911,8 @@ async function handleJobAction(e) {
     if (!job) return;
     const newName = prompt('Edit job name:', job.name);
     if (!newName || !newName.trim()) return;
-    await api('updateJob', { id, name: newName.trim() });
+    const newNumber = prompt('Edit job number:', job.job_number || '');
+    await api('updateJob', { id, name: newName.trim(), jobNumber: newNumber ? newNumber.trim() : '' });
     await loadJobs();
     showToast('Job updated ✓', 'success');
   }
@@ -979,9 +981,11 @@ async function handleJobAction(e) {
 /* ---- ADD JOB ---- */
 document.getElementById('btnAddJob').addEventListener('click', async () => {
   const name = document.getElementById('newJobName').value.trim();
+  const jobNumber = document.getElementById('newJobNumber').value.trim();
   if (!name) { showToast('Enter a job name.', 'error'); return; }
-  await api('addJob', { name, userId: state.user?.id });
+  await api('addJob', { name, jobNumber, userId: state.user?.id });
   document.getElementById('newJobName').value = '';
+  document.getElementById('newJobNumber').value = '';
   await loadJobs();
   showToast('Job created ✓', 'success');
 });

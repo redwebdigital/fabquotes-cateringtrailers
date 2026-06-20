@@ -150,15 +150,19 @@ try {
         respond(['jobs' => $jobs]);
     }
     if ($action === 'addJob') {
-        $id = genId(); $name = trim($body['name'] ?? '');
+        $id = genId();
+        $name      = trim($body['name']      ?? '');
+        $jobNumber = trim($body['jobNumber'] ?? '');
         if (!$name) respond(['error'=>'Job name required'],400);
-        $db->prepare('INSERT INTO fq_jobs (id,name,created_by) VALUES (?,?,?)')->execute([$id,$name,$body['userId']??null]);
+        $db->prepare('INSERT INTO fq_jobs (id,name,job_number,created_by) VALUES (?,?,?,?)')->execute([$id,$name,$jobNumber,$body['userId']??null]);
         respond(['success'=>true,'id'=>$id]);
     }
     if ($action === 'updateJob') {
-        $id = $body['id'] ?? ''; $name = trim($body['name'] ?? '');
+        $id        = $body['id']        ?? '';
+        $name      = trim($body['name']      ?? '');
+        $jobNumber = trim($body['jobNumber'] ?? '');
         if (!$id || !$name) respond(['error'=>'Invalid data'],400);
-        $db->prepare('UPDATE fq_jobs SET name=? WHERE id=?')->execute([$name,$id]);
+        $db->prepare('UPDATE fq_jobs SET name=?,job_number=? WHERE id=?')->execute([$name,$jobNumber,$id]);
         respond(['success'=>true]);
     }
     if ($action === 'deleteJob') {
